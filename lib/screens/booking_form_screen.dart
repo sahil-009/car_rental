@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/booking_provider.dart';
+import 'package:intl/intl.dart';
+import '../utils/globals.dart';
 import 'confirmation_screen.dart';
 
-class BookingFormScreen extends ConsumerStatefulWidget {
+class BookingFormScreen extends StatefulWidget {
   const BookingFormScreen({super.key});
 
   @override
-  ConsumerState<BookingFormScreen> createState() => _BookingFormScreenState();
+  State<BookingFormScreen> createState() => _BookingFormScreenState();
 }
 
-class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
+class _BookingFormScreenState extends State<BookingFormScreen> {
   final formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
   final locationController = TextEditingController();
@@ -18,7 +18,6 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
   DateTime? startDate;
   DateTime? endDate;
 
-  // Method to pick date
   Future<void> pickDate(bool isStartDate) async {
     final today = DateTime.now();
     final picked = await showDatePicker(
@@ -41,164 +40,190 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final booking = ref.watch(bookingProvider);
+    // using global variable directly
+    final car = GlobalData.selectedCar;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text('Booking Details', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: const Text('Booking Details'),
       ),
       body: Column(
         children: [
           Expanded(
             child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Form(
-                  key: formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Selected car info box
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.shade50,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.directions_car, color: Colors.blue.shade700),
-                            const SizedBox(width: 12),
-                            Text(
-                              booking.selectedCar?.name ?? 'Not Selected',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue.shade700),
+              padding: const EdgeInsets.all(24),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFBAD7E9).withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: const Color(0xFFBAD7E9).withOpacity(0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      // Full Name field
-                      const Text('Full Name', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 8),
-                      TextFormField(
-                        controller: nameController,
-                        decoration: InputDecoration(
-                          hintText: 'Enter your full name',
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                          filled: true,
-                          fillColor: Colors.grey.shade50,
-                        ),
-                        validator: (value) => value!.isEmpty ? 'Required' : null,
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // Start Date picker
-                      const Text('Start Date', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 8),
-                      InkWell(
-                        onTap: () => pickDate(true),
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade300),
-                            borderRadius: BorderRadius.circular(12),
-                            color: Colors.grey.shade50,
+                            child: const Icon(
+                              Icons.directions_car_filled,
+                              color: Color(0xFF2B3467),
+                              size: 30,
+                            ),
                           ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.calendar_today, color: Colors.grey.shade600, size: 20),
-                              const SizedBox(width: 12),
-                              Text(
-                                startDate == null ? 'Select start date' : startDate.toString().split(' ').first,
-                                style: TextStyle(color: startDate == null ? Colors.grey.shade600 : Colors.black),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Selected Vehicle',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  car?.name ?? 'Not Selected',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF2B3467),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            '₹${car?.price}/day',
+                             style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFFEB455F),
                               ),
-                            ],
                           ),
-                        ),
+                        ],
                       ),
+                    ),
 
-                      const SizedBox(height: 20),
+                    const SizedBox(height: 32),
 
-                      // End Date picker
-                      const Text('End Date', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 8),
-                      InkWell(
-                        onTap: () => pickDate(false),
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade300),
-                            borderRadius: BorderRadius.circular(12),
-                            color: Colors.grey.shade50,
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.calendar_today, color: Colors.grey.shade600, size: 20),
-                              const SizedBox(width: 12),
-                              Text(
-                                endDate == null ? 'Select end date' : endDate.toString().split(' ').first,
-                                style: TextStyle(color: endDate == null ? Colors.grey.shade600 : Colors.black),
+                    const Text(
+                      'Personal Information',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Color(0xFF2B3467)),
+                    ),
+                    const SizedBox(height: 16),
+
+                    TextFormField(
+                      controller: nameController,
+                      decoration: const InputDecoration(
+                        labelText: 'Full Name',
+                        prefixIcon: Icon(Icons.person_outline),
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) => value!.isEmpty ? 'Required' : null,
+                    ),
+
+                    const SizedBox(height: 24),
+                    const Text(
+                      'Trip Details',
+                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Color(0xFF2B3467)),
+                    ),
+                    const SizedBox(height: 16),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: InkWell(
+                            onTap: () => pickDate(true),
+                            borderRadius: BorderRadius.circular(16),
+                            child: IgnorePointer(
+                              child: TextFormField(
+                                key: ValueKey(startDate),
+                                initialValue: startDate != null ? DateFormat('dd MMM yyyy').format(startDate!) : null,
+                                decoration: const InputDecoration(
+                                  labelText: 'Start Date',
+                                  prefixIcon: Icon(Icons.calendar_today_outlined),
+                                  suffixIcon: Icon(Icons.arrow_drop_down),
+                                  border: OutlineInputBorder(),
+                                ),
+                                validator: (value) => startDate == null ? 'Required' : null,
                               ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // Pickup Location field
-                      const Text('Pickup Location', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 8),
-                      TextFormField(
-                        controller: locationController,
-                        decoration: InputDecoration(
-                          hintText: 'Enter pickup location',
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                          filled: true,
-                          fillColor: Colors.grey.shade50,
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: InkWell(
+                            onTap: () => pickDate(false),
+                            borderRadius: BorderRadius.circular(16),
+                            child: IgnorePointer(
+                              child: TextFormField(
+                                key: ValueKey(endDate),
+                                initialValue: endDate != null ? DateFormat('dd MMM yyyy').format(endDate!) : null,
+                                decoration: const InputDecoration(
+                                  labelText: 'End Date',
+                                  prefixIcon: Icon(Icons.calendar_today_outlined),
+                                   suffixIcon: Icon(Icons.arrow_drop_down),
+                                   border: OutlineInputBorder(),
+                                ),
+                                validator: (value) => endDate == null ? 'Required' : null,
+                              ),
+                            ),
+                          ),
                         ),
-                        validator: (value) => value!.isEmpty ? 'Required' : null,
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    TextFormField(
+                      controller: locationController,
+                      decoration: const InputDecoration(
+                        labelText: 'Pickup Location',
+                        prefixIcon: Icon(Icons.location_on_outlined),
+                        border: OutlineInputBorder(),
                       ),
-                    ],
-                  ),
+                      validator: (value) => value!.isEmpty ? 'Required' : null,
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
 
-          // Confirm button
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: Colors.white,
-              boxShadow: [BoxShadow(color: Colors.grey.shade200, blurRadius: 10, offset: const Offset(0, -4))],
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 20,
+                  offset: const Offset(0, -5),
+                ),
+              ],
             ),
             child: SizedBox(
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2B3467), foregroundColor: Colors.white),
                 onPressed: () {
-                  // Validate form and dates
                   if (formKey.currentState!.validate() && startDate != null && endDate != null) {
-                    // Save booking details
-                    ref.read(bookingProvider.notifier).saveBooking(
-                      nameController.text,
-                      startDate!,
-                      endDate!,
-                      locationController.text,
-                    );
-
-                    // Go to confirmation
+                    GlobalData.name = nameController.text;
+                    GlobalData.startDate = startDate;
+                    GlobalData.endDate = endDate;
+                    GlobalData.location = locationController.text;
+                    
                     Navigator.push(context, MaterialPageRoute(builder: (_) => const ConfirmationScreen()));
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -206,12 +231,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
                     );
                   }
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue.shade700,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                child: const Text('Confirm Booking', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                child: const Text('Confirm Booking'),
               ),
             ),
           ),

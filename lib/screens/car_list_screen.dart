@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/mock_cars.dart';
-import '../providers/booking_provider.dart';
+import '../utils/globals.dart';
 import 'car_details_screen.dart';
 
-class CarListScreen extends ConsumerWidget {
+class CarListScreen extends StatefulWidget {
   const CarListScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  State<CarListScreen> createState() => _CarListScreenState();
+}
+
+class _CarListScreenState extends State<CarListScreen> {
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text('Available Cars', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        centerTitle: true,
+        title: const Text('Available Cars'),
       ),
       body: ListView.builder(
         itemCount: mockCars.length,
@@ -24,114 +24,149 @@ class CarListScreen extends ConsumerWidget {
           final car = mockCars[index];
 
           return Container(
-            margin: const EdgeInsets.only(bottom: 16),
+            margin: const EdgeInsets.only(bottom: 20),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.shade200,
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+                  color: Color(0xFF2B3467).withOpacity(0.08),
+                  blurRadius: 20,
+                  offset: const Offset(0, 5),
                 ),
               ],
             ),
-            child: InkWell(
-              onTap: () {
-                // Check if car is available
-                if (!car.available) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Sorry, ${car.name} is not available'),
-                      backgroundColor: Colors.red.shade600,
-                    ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                   if (!car.available) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Sorry, this car is currently unavailable'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    return;
+                  }
+                  
+                  GlobalData.selectedCar = car;
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CarDetailsScreen()),
                   );
-                  return;
-                }
-                
-                // Save car and go to details screen
-                ref.read(bookingProvider.notifier).saveCar(car);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const CarDetailsScreen()),
-                );
-              },
-              borderRadius: BorderRadius.circular(16),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    // Car image placeholder i have no tt added images -
-                    Container(
-                      width: 100,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(12),
+                },
+                borderRadius: BorderRadius.circular(20),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                       // Car Image Placeholder
+                      Container(
+                        width: 110,
+                        height: 90,
+                        decoration: BoxDecoration(
+                          color: Color(0xFFBAD7E9).withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Icon(
+                          Icons.directions_car_filled_outlined,
+                          size: 40,
+                          color: Color(0xFF2B3467).withOpacity(0.6),
+                        ),
                       ),
-                      child: const Icon(Icons.directions_car, size: 40, color: Colors.grey),
-                    ),
-                    
-                    const SizedBox(width: 16),
-                    
-                    // Car info
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  car.name,
-                                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              // Show badge if not available
-                              if (!car.available)
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red.shade50,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
+                      
+                      const SizedBox(width: 20),
+                      
+                      // Car Info
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
                                   child: Text(
-                                    'Not Available',
-                                    style: TextStyle(fontSize: 10, color: Colors.red.shade700, fontWeight: FontWeight.bold),
+                                    car.name,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF2B3467),
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Icon(Icons.local_gas_station, size: 14, color: Colors.grey.shade600),
-                              const SizedBox(width: 4),
-                              Text(car.fuel, style: TextStyle(fontSize: 13, color: Colors.grey.shade600)),
-                              const SizedBox(width: 12),
-                              Icon(Icons.event_seat, size: 14, color: Colors.grey.shade600),
-                              const SizedBox(width: 4),
-                              Text('${car.seats} Seats', style: TextStyle(fontSize: 13, color: Colors.grey.shade600)),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '₹${car.price}/day',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue.shade700),
-                          ),
-                        ],
+                                if (!car.available)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Text(
+                                      'Booked',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.red,
+                                        fontWeight: FontWeight.bold
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            
+                            // Features
+                            Row(
+                              children: [
+                                _FeatureIcon(icon: Icons.local_gas_station, text: car.fuel),
+                                const SizedBox(width: 16),
+                                _FeatureIcon(icon: Icons.event_seat, text: '${car.seats} Seats'),
+                              ],
+                            ),
+                            
+                            const SizedBox(height: 12),
+                            
+                            // Price
+                            Text(
+                              '₹${car.price}/day',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFFEB455F),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    
-                    // Arrow icon
-                    Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey.shade400),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
           );
         },
       ),
+    );
+  }
+}
+
+class _FeatureIcon extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const _FeatureIcon({required this.icon, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 14, color: Colors.grey.shade600),
+        const SizedBox(width: 4),
+        Text(text, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+      ],
     );
   }
 }

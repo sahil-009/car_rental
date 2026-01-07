@@ -1,105 +1,134 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/booking_provider.dart';
+import 'package:intl/intl.dart';
+import '../utils/globals.dart';
 
-class ConfirmationScreen extends ConsumerWidget {
+class ConfirmationScreen extends StatefulWidget {
   const ConfirmationScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final booking = ref.watch(bookingProvider);
+  State<ConfirmationScreen> createState() => _ConfirmationScreenState();
+}
 
-    // Check if booking exists
-    if (booking.selectedCar == null) {
-      return const Scaffold(body: Center(child: Text('No booking found.')));
-    }
-
-    final car = booking.selectedCar!;
+class _ConfirmationScreenState extends State<ConfirmationScreen> {
+  @override
+  Widget build(BuildContext context) {
+    final car = GlobalData.selectedCar!;
     
-    // Calculate days and total cost
-    final days = booking.startDate != null && booking.endDate != null
-        ? booking.endDate!.difference(booking.startDate!).inDays + 1
+    final days = GlobalData.startDate != null && GlobalData.endDate != null
+        ? GlobalData.endDate!.difference(GlobalData.startDate!).inDays + 1
         : 1;
     final totalCost = days * car.price;
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: const SizedBox(),
-        title: const Text('Booking Confirmed', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        centerTitle: true,
-      ),
       body: Column(
         children: [
           Expanded(
             child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 60),
                 child: Column(
                   children: [
                     const SizedBox(height: 20),
                     
-                    // Success icon
+                    // Success Circle
                     Container(
-                      width: 100,
-                      height: 100,
+                      width: 120,
+                      height: 120,
                       decoration: BoxDecoration(
                         color: Colors.green.shade50,
                         shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.green.withOpacity(0.2),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
                       ),
-                      child: Icon(Icons.check_circle, color: Colors.green.shade600, size: 60),
+                      child: Icon(Icons.check_circle_rounded, color: Colors.green.shade600, size: 80),
                     ),
                     
-                    const SizedBox(height: 24),
-                    const Text('Booking Successful!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 32),
+                    Text(
+                      'Booking Confirmed!',
+                      style: TextStyle(
+                        fontSize: 26,
+                        color: Color(0xFF2B3467),
+                        fontWeight: FontWeight.bold
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                     const SizedBox(height: 8),
-                    Text('Your car has been booked', style: TextStyle(fontSize: 14, color: Colors.grey.shade600)),
+                    Text(
+                      'Your car is ready for pick up',
+                      style: TextStyle(fontSize: 16, color: Colors.grey[800]),
+                    ),
                     
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 48),
                     
-                    // Booking details card
+                    // Summary Card
                     Container(
-                      padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade50,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.grey.shade200),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                        border: Border.all(color: Colors.grey.shade100),
                       ),
                       child: Column(
                         children: [
-                          buildDetailRow('Car', car.name),
-                          const Divider(height: 24),
-                          buildDetailRow('Name', booking.customerName ?? '-'),
-                          const Divider(height: 24),
-                          buildDetailRow('Pickup Location', booking.pickupLocation ?? '-'),
-                          const Divider(height: 24),
-                          buildDetailRow('Start Date', booking.startDate.toString().split(' ').first),
-                          const Divider(height: 24),
-                          buildDetailRow('End Date', booking.endDate.toString().split(' ').first),
-                          const Divider(height: 24),
-                          buildDetailRow('Duration', '$days days'),
-                        ],
-                      ),
-                    ),
-                    
-                    const SizedBox(height: 24),
-                    
-                    // Total cost box
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.shade50,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text('Total Amount', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                          Text(
-                            '₹$totalCost',
-                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue.shade700),
+                           Padding(
+                            padding: const EdgeInsets.all(24),
+                            child: Column(
+                              children: [
+                                _DetailRow(label: 'Car Model', value: car.name, isBold: true),
+                                const Divider(height: 32),
+                                _DetailRow(label: 'Customer', value: GlobalData.name),
+                                const SizedBox(height: 16),
+                                _DetailRow(label: 'Pickup', value: GlobalData.location),
+                                const SizedBox(height: 16),
+                                _DetailRow(
+                                  label: 'Duration', 
+                                  value: '${DateFormat('d MMM').format(GlobalData.startDate!)} - ${DateFormat('d MMM').format(GlobalData.endDate!)} ($days Days)'
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: Color(0xFF2B3467).withOpacity(0.05),
+                              borderRadius: const BorderRadius.only(
+                                bottomLeft: Radius.circular(24),
+                                bottomRight: Radius.circular(24),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Total Paid',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF2B3467),
+                                  ),
+                                ),
+                                Text(
+                                  '₹$totalCost',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF2B3467),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -110,26 +139,32 @@ class ConfirmationScreen extends ConsumerWidget {
             ),
           ),
           
-          // Done button
+          // Home Button
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: Colors.white,
-              boxShadow: [BoxShadow(color: Colors.grey.shade200, blurRadius: 10, offset: const Offset(0, -4))],
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 20,
+                  offset: const Offset(0, -5),
+                ),
+              ],
             ),
             child: SizedBox(
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF2B3467),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                ),
                 onPressed: () {
                   Navigator.pushNamedAndRemoveUntil(context, '/cars', (_) => false);
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue.shade700,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                child: const Text('Done', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                child: const Text('Back to Home'),
               ),
             ),
           ),
@@ -137,14 +172,44 @@ class ConfirmationScreen extends ConsumerWidget {
       ),
     );
   }
+}
 
-  // Helper method for detail row
-  Widget buildDetailRow(String label, String value) {
+class _DetailRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final bool isBold;
+
+  const _DetailRow({
+    required this.label,
+    required this.value,
+    this.isBold = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(fontSize: 14, color: Colors.grey.shade600)),
-        Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[500],
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Text(
+            value,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
+              color: Color(0xFF2B3467),
+            ),
+            textAlign: TextAlign.right,
+          ),
+        ),
       ],
     );
   }

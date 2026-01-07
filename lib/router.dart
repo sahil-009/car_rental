@@ -5,6 +5,7 @@ import 'screens/car_list_screen.dart';
 import 'screens/car_details_screen.dart';
 import 'screens/booking_form_screen.dart';
 import 'screens/confirmation_screen.dart';
+import 'screens/splash_screen.dart';
 
 class AppRouter {
   static Route<dynamic> generate(RouteSettings settings) {
@@ -19,8 +20,13 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const BookingFormScreen());
       case "/confirmation":
         return MaterialPageRoute(builder: (_) => const ConfirmationScreen());
-      default:
+      case "/login":
         return MaterialPageRoute(builder: (_) => const LoginScreen());
+      case "/splash":
+        return MaterialPageRoute(builder: (_) => const SplashScreen());
+      default:
+        // Changed default to Splash
+        return MaterialPageRoute(builder: (_) => const SplashScreen());
     }
   }
 }

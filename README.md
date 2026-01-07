@@ -1,48 +1,40 @@
-
-# loom video link  
-        https://www.loom.com/share/833729475457427a8981bc203bb49a64
 # Car Rental App
 
-A simple car rental booking app built with Flutter. This is a basic MVP-style application for learning purposes.
+A modern, premium car rental application built with Flutter. Experience seamless booking, detailed car specifications, and a beautiful user interface.
+
+## Loom Video Demo
+
+[Link to Loom Video]
 
 ## Features
 
-- **Login Screen**: Mock user authentication (no backend required)
-- **Car List**: Browse available cars with pricing
-- **Car Details**: View detailed information about each car
-- **Booking Form**: Fill in rental details (name, dates, location)
-- **Confirmation**: See booking summary and total cost
+* **Modern UI/UX**: Sleek design with smooth animations and a premium feel.
+* **User Authentication**: Login and Sign Up screens with validation.
+* **Car Listing**: Browse a variety of premium vehicles with daily rates.
+* **Detailed Views**: View comprehensive car specifications (Fuel, Capacity, Speed, etc.).
+* **Booking System**: Select dates and locations to book your ride.
+* **State Management**: Powered by **Riverpod** for efficient state handling.
 
-## Tech Stack
+## Technology Stack
 
-- **Flutter**: UI framework
-- **Riverpod**: State management
-- **Mock Data**: No backend needed - all data is local
+* **Framework**: Flutter
+* **Language**: Dart
+* **State Management**: Flutter Riverpod
+* **Fonts**: Google Fonts (Poppins)
 
-## How to Run
-
-1. Make sure you have Flutter installed on your system
-2. Clone this repository
-3. Navigate to the project folder
-4. Run the following commands:
-
-```bash
-flutter pub get
-flutter run
-```
+1. 
+2. **Install Dependencies**:
+   ```bash
+   flutter pub get
+   ```
+3. **Run the App**:
+   ```bash
+   flutter run
+   ```
 
 ## Project Structure
 
-## Dummy Login
-
-You can login with any email and password. Just make sure both fields are filled.
-
-## Adding Car Images
-
-Place your car images in the `assets/images/` folder and they will be automatically included in the app.
-i have not added athat
-
-
-Made by sahilmund
-github sahil-009
-date 10 Dec 2025# car-rental
+* `lib/screens`: UI screens (Login, Home, Details, Booking, etc.)
+* `lib/providers`: Riverpod providers for state management.
+* `lib/theme`: App theme configuration and color palette.
+* `lib/models`: Data models.

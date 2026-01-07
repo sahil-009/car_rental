@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'router.dart';
 
 void main() {
-  runApp(const ProviderScope(child: MyApp()));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -16,7 +15,7 @@ class MyApp extends StatelessWidget {
       title: 'Car Rental App',
       onGenerateRoute: AppRouter.generate,
       initialRoute: '/',
-      theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.blue),
+      // theme: AppTheme.lightTheme, // i will add colors manualy in screens
     );
   }
 }

@@ -1,89 +1,171 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/booking_provider.dart';
+import '../utils/globals.dart';
 import 'booking_form_screen.dart';
 
-class CarDetailsScreen extends ConsumerWidget {
+class CarDetailsScreen extends StatefulWidget {
   const CarDetailsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final booking = ref.watch(bookingProvider);
-    final car = booking.selectedCar;
+  State<CarDetailsScreen> createState() => _CarDetailsScreenState();
+}
 
-    // Check if car exists
+class _CarDetailsScreenState extends State<CarDetailsScreen> {
+  @override
+  Widget build(BuildContext context) {
+    // get from global
+    final car = GlobalData.selectedCar;
+
     if (car == null) {
       return const Scaffold(body: Center(child: Text('No car selected.')));
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+        leading: Container(
+          margin: const EdgeInsets.only(left: 16),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Color(0xFF2B3467)),
+            onPressed: () => Navigator.pop(context),
+          ),
         ),
-        title: const Text('Car Details', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
       ),
       body: Column(
         children: [
           Expanded(
             child: SingleChildScrollView(
+              padding: EdgeInsets.zero,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Car image
+
                   Container(
-                    height: 220,
+                    height: 300,
                     width: double.infinity,
-                    margin: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(16),
+                      color: Color(0xFFBAD7E9).withOpacity(0.3),
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(40),
+                        bottomRight: Radius.circular(40),
+                      ),
                     ),
-                    child: const Center(child: Icon(Icons.directions_car, size: 100, color: Colors.grey)),
+                    child: Center(
+                      child: Icon(
+                        Icons.directions_car_filled_outlined,
+                        size: 140,
+                        color: Color(0xFF2B3467).withOpacity(0.8),
+                      ),
+                    ),
                   ),
 
+                  const SizedBox(height: 24),
+
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Car name and price
-                        Text(car.name, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 8),
-                        Text('₹${car.price}/day', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.blue.shade700)),
-                        
-                        const SizedBox(height: 24),
-                        const Text('Specifications', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 16),
-                        
-                        // Spec cards
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(child: buildSpecCard(Icons.local_gas_station, 'Fuel Type', car.fuel)),
-                            const SizedBox(width: 12),
-                            Expanded(child: buildSpecCard(Icons.event_seat, 'Seats', '${car.seats}')),
+                            Expanded(
+                              child: Text(
+                                car.name,
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF2B3467),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: Color(0xFFEB455F).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                '₹${car.price}/day',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Color(0xFFEB455F),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
+                        
+                        const SizedBox(height: 32),
+                        Text(
+                          'Car Detail',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF2B3467),
+                          ),
+                        ),
                         const SizedBox(height: 16),
-                        Row(
+                        
+
+                        GridView.count(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisCount: 2,
+                          childAspectRatio: 1.3,
+                          mainAxisSpacing: 16,
+                          crossAxisSpacing: 16,
                           children: [
-                            Expanded(child: buildSpecCard(Icons.check_circle, 'Status', car.available ? 'Available' : 'Booked')),
-                            const SizedBox(width: 12),
-                            Expanded(child: buildSpecCard(Icons.speed, 'Type', 'Automatic')),
+                            _SpecCard(
+                              icon: Icons.local_gas_station,
+                              label: 'Fuel Type',
+                              value: car.fuel,
+                            ),
+                            _SpecCard(
+                              icon: Icons.event_seat,
+                              label: 'Capacity',
+                              value: '${car.seats} Seats',
+                            ),
+                             const _SpecCard(
+                              icon: Icons.speed,
+                              label: 'Top Speed',
+                              value: '220 km/h',
+                            ),
+                            const _SpecCard(
+                              icon: Icons.settings,
+                              label: 'Transmission',
+                              value: 'Automatic',
+                            ),
                           ],
                         ),
                         
-                        const SizedBox(height: 24),
-                        const Text('Description', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 32),
+                        Text(
+                          'Description',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF2B3467),
+                          ),
+                        ),
                         const SizedBox(height: 8),
                         Text(
-                          'A comfortable and reliable vehicle suitable for long trips, highways, and city driving. Perfect for families and business trips.',
-                          style: TextStyle(fontSize: 14, color: Colors.grey.shade700, height: 1.5),
+                          "Experience the ultimate driving comfort with this premium vehicle. Features include advanced safety systems, spacious interiors, and top-tier fuel efficiency for long drives. Perfect for city commutes and weekend getaways alike.",
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(
+                            fontSize: 16,
+                            height: 1.6,
+                            color: Colors.grey[800],
+                          ),
                         ),
+                        const SizedBox(height: 100),
                       ],
                     ),
                   ),
@@ -92,26 +174,32 @@ class CarDetailsScreen extends ConsumerWidget {
             ),
           ),
           
-          // Book Now button
+
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: Colors.white,
-              boxShadow: [BoxShadow(color: Colors.grey.shade200, blurRadius: 10, offset: const Offset(0, -4))],
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 20,
+                  offset: const Offset(0, -5),
+                ),
+              ],
             ),
             child: SizedBox(
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF2B3467),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                ),
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (_) => const BookingFormScreen()));
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue.shade700,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                child: const Text('Book Now', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                child: const Text('Book Now'),
               ),
             ),
           ),
@@ -119,23 +207,50 @@ class CarDetailsScreen extends ConsumerWidget {
       ),
     );
   }
+}
 
-  // Helper method to build spec card
-  Widget buildSpecCard(IconData icon, String label, String value) {
+class _SpecCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _SpecCard({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
+        color: Color(0xFFF8F9FA),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.grey.shade200),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: Colors.blue.shade700, size: 24),
+          Icon(icon, color: Color(0xFF2B3467), size: 28),
           const SizedBox(height: 8),
-          Text(label, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey[500],
+            ),
+          ),
           const SizedBox(height: 4),
-          Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2B3467),
+            ),
+          ),
         ],
       ),
     );
