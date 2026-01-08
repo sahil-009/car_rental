@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../utils/globals.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/app_state.dart';
+import '../data/mock_cars.dart';
 import 'confirmation_screen.dart';
 
-class BookingFormScreen extends StatefulWidget {
+class BookingFormScreen extends ConsumerStatefulWidget {
   const BookingFormScreen({super.key});
 
   @override
-  State<BookingFormScreen> createState() => _BookingFormScreenState();
+  ConsumerState<BookingFormScreen> createState() => _BookingFormScreenState();
 }
 
-class _BookingFormScreenState extends State<BookingFormScreen> {
+class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
   final formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
   final locationController = TextEditingController();
@@ -41,7 +43,8 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
   @override
   Widget build(BuildContext context) {
     // using global variable directly
-    final car = GlobalData.selectedCar;
+    final carId = ref.watch(appStateProvider).selectedCarId;
+    final car = mockCars.firstWhere((c) => c.name == carId, orElse: () => mockCars.first);
 
     return Scaffold(
       appBar: AppBar(
@@ -219,10 +222,12 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                 style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2B3467), foregroundColor: Colors.white),
                 onPressed: () {
                   if (formKey.currentState!.validate() && startDate != null && endDate != null) {
-                    GlobalData.name = nameController.text;
-                    GlobalData.startDate = startDate;
-                    GlobalData.endDate = endDate;
-                    GlobalData.location = locationController.text;
+                    ref.read(appStateProvider.notifier).setBookingInfo(
+                      name: nameController.text,
+                      startDate: startDate!,
+                      endDate: endDate!,
+                      location: locationController.text,
+                    );
                     
                     Navigator.push(context, MaterialPageRoute(builder: (_) => const ConfirmationScreen()));
                   } else {

@@ -4,6 +4,7 @@ class Car {
   final int price;
   final String fuel;
   final int seats;
+  final String category;
   final bool available;
 
   Car({
@@ -11,6 +12,7 @@ class Car {
     required this.price,
     required this.fuel,
     required this.seats,
+    required this.category,
     this.available = true,
   });
 }

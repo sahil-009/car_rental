@@ -1,21 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../utils/globals.dart';
-
-class ConfirmationScreen extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/app_state.dart';
+import '../data/mock_cars.dart';
+class ConfirmationScreen extends ConsumerWidget {
   const ConfirmationScreen({super.key});
 
   @override
-  State<ConfirmationScreen> createState() => _ConfirmationScreenState();
-}
-
-class _ConfirmationScreenState extends State<ConfirmationScreen> {
-  @override
-  Widget build(BuildContext context) {
-    final car = GlobalData.selectedCar!;
-    
-    final days = GlobalData.startDate != null && GlobalData.endDate != null
-        ? GlobalData.endDate!.difference(GlobalData.startDate!).inDays + 1
+  Widget build(BuildContext context, WidgetRef ref) {
+    final carId = ref.watch(appStateProvider).selectedCarId;
+    final car = mockCars.firstWhere((c) => c.name == carId, orElse: () => mockCars.first);
+    final days = ref.watch(appStateProvider).startDate != null && ref.watch(appStateProvider).endDate != null
+        ? ref.watch(appStateProvider).endDate!.difference(ref.watch(appStateProvider).startDate!).inDays + 1
         : 1;
     final totalCost = days * car.price;
 
@@ -88,13 +84,13 @@ class _ConfirmationScreenState extends State<ConfirmationScreen> {
                               children: [
                                 _DetailRow(label: 'Car Model', value: car.name, isBold: true),
                                 const Divider(height: 32),
-                                _DetailRow(label: 'Customer', value: GlobalData.name),
+                                _DetailRow(label: 'Customer', value: ref.watch(appStateProvider).name ?? ''),
                                 const SizedBox(height: 16),
-                                _DetailRow(label: 'Pickup', value: GlobalData.location),
+                                _DetailRow(label: 'Pickup', value: ref.watch(appStateProvider).location ?? ''),
                                 const SizedBox(height: 16),
                                 _DetailRow(
                                   label: 'Duration', 
-                                  value: '${DateFormat('d MMM').format(GlobalData.startDate!)} - ${DateFormat('d MMM').format(GlobalData.endDate!)} ($days Days)'
+                                  value: '${DateFormat('d MMM').format(ref.watch(appStateProvider).startDate!)} - ${DateFormat('d MMM').format(ref.watch(appStateProvider).endDate!)} ($days Days)'
                                 ),
                               ],
                             ),

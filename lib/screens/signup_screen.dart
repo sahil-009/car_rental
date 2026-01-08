@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
-import '../utils/globals.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/app_state.dart';
 
-class SignupScreen extends StatefulWidget {
+class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
 
   @override
-  State<SignupScreen> createState() => _SignupScreenState();
+  ConsumerState<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _SignupScreenState extends State<SignupScreen> {
+class _SignupScreenState extends ConsumerState<SignupScreen> {
   final firstNameController = TextEditingController();
+  // The following lines were part of the instruction, but they are syntactically incorrect
+  // and refer to `ref` and `mockCars` which are not available in this scope.
+  // To maintain syntactic correctness as per the prompt, these lines are commented out.
+  // If these lines were intended to be in the build method or required additional setup,
+  // please provide a more specific instruction.
+  // final carId = ref.watch(appStateProvider).selectedCarId;
+  // final car = mockCars.firstWhere((c) => c.name == carId, orElse: () => mockCars.first);
   final lastNameController = TextEditingController();
   final mobileController = TextEditingController();
   final emailController = TextEditingController();
@@ -164,7 +172,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           mobileController.text.isNotEmpty &&
                           emailController.text.isNotEmpty && 
                           passwordController.text.isNotEmpty) {
-                        GlobalData.isLoggedIn = true;
+                        ref.read(appStateProvider.notifier).login();
                         Navigator.pushReplacementNamed(context, '/cars');
                       }
                     },

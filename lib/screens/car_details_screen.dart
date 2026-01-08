@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
-import '../utils/globals.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/app_state.dart';
+import '../data/mock_cars.dart';
 import 'booking_form_screen.dart';
 
-class CarDetailsScreen extends StatefulWidget {
+class CarDetailsScreen extends ConsumerStatefulWidget {
   const CarDetailsScreen({super.key});
 
   @override
-  State<CarDetailsScreen> createState() => _CarDetailsScreenState();
+  ConsumerState<CarDetailsScreen> createState() => _CarDetailsScreenState();
 }
 
-class _CarDetailsScreenState extends State<CarDetailsScreen> {
+class _CarDetailsScreenState extends ConsumerState<CarDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     // get from global
-    final car = GlobalData.selectedCar;
+    final carId = ref.watch(appStateProvider).selectedCarId;
+    final car = mockCars.firstWhere((c) => c.name == carId, orElse: () => mockCars.first);
 
     if (car == null) {
       return const Scaffold(body: Center(child: Text('No car selected.')));

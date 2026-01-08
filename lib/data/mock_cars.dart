@@ -7,13 +7,15 @@ final List<Car> mockCars = [
     price: 1200,
     fuel: 'Petrol',
     seats: 5,
+    category: 'Sedan',
     available: true,  // Available
   ),
   Car(
     name: 'Fortuner',
-    price: 800,
+    price: 3000,
     fuel: 'Petrol',
     seats: 5,
+    category: 'Luxury',
     available: true,  // Available
   ),
   Car(
@@ -21,6 +23,7 @@ final List<Car> mockCars = [
     price: 1800,
     fuel: 'Diesel',
     seats: 5,
+    category: 'SUV',
     available: false,  // NOT Available
   ),
   Car(
@@ -28,6 +31,7 @@ final List<Car> mockCars = [
     price: 2500,
     fuel: 'Diesel',
     seats: 7,
+    category: 'SUV',
     available: true,  // Available
   ),
   Car(
@@ -35,6 +39,7 @@ final List<Car> mockCars = [
     price: 3000,
     fuel: 'Diesel',
     seats: 4,
+    category: 'SUV',
     available: false,  // NOT Available
   ),
   Car(
@@ -42,6 +47,15 @@ final List<Car> mockCars = [
     price: 1500,
     fuel: 'Petrol',
     seats: 5,
+    category: 'SUV',
     available: true,  // Available
+  ),
+  Car(
+    name: 'Land Rover Defender',
+    price: 5000,
+    fuel: 'Diesel',
+    seats: 5,
+    category: 'Luxury',
+    available: true,
   ),
 ];
